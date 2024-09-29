@@ -74,7 +74,8 @@ const search = async () => {
       if (expandedField[i][j] !== '＊') {
         // 横方向
         if (expandedField[i][j - 1] === '＊' && expandedField[i][j + 1] !== '＊') {
-          let length = 1, tempWord = expandedField[i][j]
+          let length = 1,
+            tempWord = expandedField[i][j]
           while (expandedField[i][j + length] !== '＊') {
             tempWord += expandedField[i][j + length]
             length++
@@ -89,7 +90,8 @@ const search = async () => {
         }
         // 縦方向
         if (expandedField[i - 1][j] === '＊' && expandedField[i + 1][j] !== '＊') {
-          let length = 1, tempWord = expandedField[i][j]
+          let length = 1,
+            tempWord = expandedField[i][j]
           while (expandedField[i + length][j] !== '＊') {
             tempWord += expandedField[i + length][j]
             length++
@@ -109,7 +111,6 @@ const search = async () => {
   console.log(slots)
 
   // TODO: 単語になっている必要のあるスロットに対して検索
-  
 
   isLoading.value = false
 }
@@ -120,7 +121,7 @@ watch([H, W], () => {
   for (let i = 0; i < H.value; i++) {
     for (let j = 0; j < W.value; j++) {
       if (i < field.value.length && j < field.value[i].length) {
-        newField[i][j] = field.value[i][j] || '＿'
+        newField[i][j] = field.value[i][j] || 'white'
       }
     }
   }
@@ -142,14 +143,17 @@ watch(selectedColor, (newValue) => {
 watch(
   field,
   (newValue) => {
-    console.log('field changed')
     sessionStorage.setItem('Crossword_field', JSON.stringify(newValue))
+    fieldToString()
   },
   { deep: true }
 )
 
+const fieldStrings = ref<Array<Array<string>>>(
+  Array.from({ length: H.value }, () => Array.from({ length: W.value }, () => '＿'))
+)
+
 const draw = (i: number, j: number) => {
-  console.log(i, j)
   field.value[i][j] = selectedColor.value
 }
 
@@ -201,7 +205,7 @@ onMounted(() => {
     sessionStorage.setItem('Crossword_inputString', inputString.value.toString())
   }
   const initialPlayareaColor = Array.from({ length: H.value }, () =>
-    Array.from({ length: W.value }, () => '＿')
+    Array.from({ length: W.value }, () => 'white')
   )
   if (sessionStorage.getItem('Crossword_field')) {
     field.value = JSON.parse(sessionStorage.getItem('Crossword_field') || '[]')
@@ -209,8 +213,8 @@ onMounted(() => {
       field.value = initialPlayareaColor
     }
   } else {
-    sessionStorage.setItem('Crossword_field', JSON.stringify(field.value))
     field.value = initialPlayareaColor
+    sessionStorage.setItem('Crossword_field', JSON.stringify(field.value))
   }
   console.log(field.value)
 })
@@ -229,13 +233,9 @@ const reset = () => {
   }
 }
 
-const fieldStrings = ref<Array<Array<string>>>(
-  Array.from({ length: H.value }, () => Array.from({ length: W.value }, () => '＿'))
-)
-
 const stringToField = () => {
   const newField = Array.from({ length: H.value }, () =>
-    Array.from({ length: W.value }, () => '＿')
+    Array.from({ length: W.value }, () => 'white')
   )
   for (let i = 0; i < H.value; i++) {
     for (let j = 0; j < W.value; j++) {
@@ -276,7 +276,6 @@ const fieldToString = () => {
     </div>
     <div class="convert">
       <button @click="stringToField()">変換↓</button>
-      <button @click="fieldToString()">変換↑</button>
     </div>
     <div class="play-area">
       <div class="field">
