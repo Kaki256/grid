@@ -24,6 +24,96 @@ watch(inputString, (newValue) => {
   fieldStrings.value = newFieldStrings
 })
 
+const isLoading = ref(false)
+
+const dictNames = ['buta', 'eigo', 'illust1_3', 'ippan']
+const selectedDict = ref(dictNames[0])
+watch(selectedDict, () => {
+  sessionStorage.setItem('Crossword_selectedDict', selectedDict.value)
+})
+const dict = ref<string[]>([])
+
+const loadDict = async () => {
+  const response = await fetch(`/src/assets/dictionaries/${selectedDict.value}.txt`)
+  const text = await response.text()
+  dict.value = text.split('\n')
+}
+
+interface Slot {
+  x: number
+  y: number
+  direction: 'horizontal' | 'vertical'
+  length: number
+  word: string
+}
+
+const search = async () => {
+  isLoading.value = true
+  await loadDict()
+  // expandedField.value は field.value の周りに１マスずつ黒マス '＊' を追加したもの
+  const expandedField = Array.from({ length: H.value + 2 }, () =>
+    Array.from({ length: W.value + 2 }, () => '＊')
+  )
+  for (let i = 0; i < H.value; i++) {
+    for (let j = 0; j < W.value; j++) {
+      if (field.value[i][j] === 'white') {
+        expandedField[i + 1][j + 1] = '＿'
+      } else if (field.value[i][j] === 'black') {
+        expandedField[i + 1][j + 1] = '＊'
+      } else {
+        expandedField[i + 1][j + 1] = field.value[i][j]
+      }
+    }
+  }
+  console.log(expandedField)
+
+  // 単語になっている必要のあるスロットを列挙
+  const slots: Slot[] = []
+  for (let i = 1; i <= H.value; i++) {
+    for (let j = 1; j <= W.value; j++) {
+      if (expandedField[i][j] !== '＊') {
+        // 横方向
+        if (expandedField[i][j - 1] === '＊' && expandedField[i][j + 1] !== '＊') {
+          let length = 1, tempWord = expandedField[i][j]
+          while (expandedField[i][j + length] !== '＊') {
+            tempWord += expandedField[i][j + length]
+            length++
+          }
+          slots.push({
+            x: j,
+            y: i,
+            direction: 'horizontal',
+            length: length,
+            word: tempWord
+          })
+        }
+        // 縦方向
+        if (expandedField[i - 1][j] === '＊' && expandedField[i + 1][j] !== '＊') {
+          let length = 1, tempWord = expandedField[i][j]
+          while (expandedField[i + length][j] !== '＊') {
+            tempWord += expandedField[i + length][j]
+            length++
+          }
+          slots.push({
+            x: j,
+            y: i,
+            direction: 'vertical',
+            length: length,
+            word: tempWord
+          })
+        }
+      }
+    }
+  }
+
+  console.log(slots)
+
+  // TODO: 単語になっている必要のあるスロットに対して検索
+  
+
+  isLoading.value = false
+}
+
 // H, W が 変更されるたびに実行される
 watch([H, W], () => {
   let newField = Array.from({ length: H.value }, () => Array.from({ length: W.value }, () => '＿'))
@@ -168,7 +258,6 @@ const fieldToString = () => {
     .replace(/black/g, '＊')
     .replace(/white/g, '＿')
 }
-
 </script>
 
 <template>
@@ -223,6 +312,13 @@ const fieldToString = () => {
       <div v-for="color in pallet" :key="color">
         <CellLook :cellSize="50" :color="color" @click="selectedColor = color" />
       </div>
+    </div>
+    <div class="control">
+      <label for="selectedDict">辞書選択</label>
+      <select id="selectedDict" v-model="selectedDict">
+        <option v-for="name in dictNames" :key="name" :value="name">{{ name }}</option>
+      </select>
+      <button @click="search">検索</button>
     </div>
     <div class="debug">
       <button @click="reset()">リセット</button>
