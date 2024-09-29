@@ -14,8 +14,15 @@ const selectedColor = ref('black')
 
 // field : ＿ or ＊ or ひらがな
 const field = ref<Array<Array<string>>>(
-  Array.from({ length: H.value }, () => Array.from({ length: W.value }, () => '＿'))
+  Array.from({ length: H.value }, () => Array.from({ length: W.value }, () => 'white'))
 )
+
+const inputString = ref('')
+watch(inputString, (newValue) => {
+  sessionStorage.setItem('Crossword_inputString', newValue.toString())
+  const newFieldStrings = newValue.split('\n').map((line) => line.split(''))
+  fieldStrings.value = newFieldStrings
+})
 
 // H, W が 変更されるたびに実行される
 watch([H, W], () => {
