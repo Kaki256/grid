@@ -12,24 +12,26 @@ const pallet = ['black', 'white']
 
 const selectedColor = ref('black')
 
-const playareaColor = ref<Array<Array<string>>>(
-  Array.from({ length: H.value }, () => Array.from({ length: W.value }, () => 'white'))
+// field : ＿ or ＊ or ひらがな
+const field = ref<Array<Array<string>>>(
+  Array.from({ length: H.value }, () => Array.from({ length: W.value }, () => '＿'))
 )
 
 // H, W が 変更されるたびに実行される
 watch([H, W], () => {
-  let newPlayareaColor = Array.from({ length: H.value }, () =>
-    Array.from({ length: W.value }, () => 'white')
-  )
+  let newField = Array.from({ length: H.value }, () => Array.from({ length: W.value }, () => '＿'))
   for (let i = 0; i < H.value; i++) {
     for (let j = 0; j < W.value; j++) {
-      newPlayareaColor[i][j] = playareaColor.value[i][j] || 'white'
+      if (i < field.value.length && j < field.value[i].length) {
+        newField[i][j] = field.value[i][j] || '＿'
+      }
     }
   }
-  playareaColor.value = newPlayareaColor
+  field.value = newField
+
   sessionStorage.setItem('Crossword_H', H.value.toString())
   sessionStorage.setItem('Crossword_W', W.value.toString())
-  sessionStorage.setItem('Crossword_playareaColor', JSON.stringify(playareaColor.value))
+  sessionStorage.setItem('Crossword_field', JSON.stringify(field.value))
 })
 
 watch(cellSize, (newValue) => {
@@ -41,17 +43,17 @@ watch(selectedColor, (newValue) => {
 })
 
 watch(
-  playareaColor,
+  field,
   (newValue) => {
-    console.log('playareaColor changed')
-    sessionStorage.setItem('Crossword_playareaColor', JSON.stringify(newValue))
+    console.log('field changed')
+    sessionStorage.setItem('Crossword_field', JSON.stringify(newValue))
   },
   { deep: true }
 )
 
 const draw = (i: number, j: number) => {
   console.log(i, j)
-  playareaColor.value[i][j] = selectedColor.value
+  field.value[i][j] = selectedColor.value
 }
 
 let dragging = false
@@ -75,7 +77,7 @@ document.addEventListener('mouseup', handleMouseUp)
 
 onMounted(() => {
   console.log('mounted')
-  console.log(sessionStorage.getItem('Crossword_playareaColor'))
+  console.log(sessionStorage.getItem('Crossword_field'))
   if (sessionStorage.getItem('Crossword_H')) {
     H.value = parseInt(sessionStorage.getItem('Crossword_H') || '5')
   } else {
@@ -96,19 +98,24 @@ onMounted(() => {
   } else {
     sessionStorage.setItem('Crossword_selectedColor', selectedColor.value.toString())
   }
+  if (sessionStorage.getItem('Crossword_inputString')) {
+    inputString.value = sessionStorage.getItem('Crossword_inputString') || ''
+  } else {
+    sessionStorage.setItem('Crossword_inputString', inputString.value.toString())
+  }
   const initialPlayareaColor = Array.from({ length: H.value }, () =>
-    Array.from({ length: W.value }, () => 'white')
+    Array.from({ length: W.value }, () => '＿')
   )
-  if (sessionStorage.getItem('Crossword_playareaColor')) {
-    playareaColor.value = JSON.parse(sessionStorage.getItem('Crossword_playareaColor') || '[]')
-    if (playareaColor.value.length === 0) {
-      playareaColor.value = initialPlayareaColor
+  if (sessionStorage.getItem('Crossword_field')) {
+    field.value = JSON.parse(sessionStorage.getItem('Crossword_field') || '[]')
+    if (field.value.length === 0) {
+      field.value = initialPlayareaColor
     }
   } else {
-    sessionStorage.setItem('Crossword_playareaColor', JSON.stringify(playareaColor.value))
-    playareaColor.value = initialPlayareaColor
+    sessionStorage.setItem('Crossword_field', JSON.stringify(field.value))
+    field.value = initialPlayareaColor
   }
-  console.log(playareaColor.value)
+  console.log(field.value)
 })
 
 const reset = () => {
@@ -116,14 +123,45 @@ const reset = () => {
   W.value = 5
   cellSize.value = 40
   selectedColor.value = 'black'
-  playareaColor.value = []
+  field.value = []
   for (let i = 0; i < H.value; i++) {
-    playareaColor.value.push([])
+    field.value.push([])
     for (let j = 0; j < W.value; j++) {
-      playareaColor.value[i].push('white')
+      field.value[i].push('white')
     }
   }
 }
+
+const fieldStrings = ref<Array<Array<string>>>(
+  Array.from({ length: H.value }, () => Array.from({ length: W.value }, () => '＿'))
+)
+
+const stringToField = () => {
+  const newField = Array.from({ length: H.value }, () =>
+    Array.from({ length: W.value }, () => '＿')
+  )
+  for (let i = 0; i < H.value; i++) {
+    for (let j = 0; j < W.value; j++) {
+      if (field.value[i] && fieldStrings.value[i][j] == '＊') {
+        newField[i][j] = 'black'
+      } else if (field.value[i] && fieldStrings.value[i][j] == '＿') {
+        newField[i][j] = 'white'
+      } else {
+        newField[i][j] = fieldStrings.value[i][j]
+      }
+    }
+  }
+  field.value = newField
+}
+
+const fieldToString = () => {
+  inputString.value = field.value
+    .join('\n')
+    .replace(/,/g, '')
+    .replace(/black/g, '＊')
+    .replace(/white/g, '＿')
+}
+
 </script>
 
 <template>
@@ -136,16 +174,37 @@ const reset = () => {
       <label for="cellSize">セルサイズ:</label>
       <input id="cellSize" type="number" v-model="cellSize" />
     </div>
+    <div class="stringInput">
+      <label for="inputString">入力文字列：</label>
+      <textarea v-model="inputString" style="width: 60%; height: 100px"></textarea>
+    </div>
+    <div class="convert">
+      <button @click="stringToField()">変換↓</button>
+      <button @click="fieldToString()">変換↑</button>
+    </div>
     <div class="play-area">
       <div class="field">
         <div class="row" v-for="i in H" :key="i">
           <div v-for="j in W" :key="i * H + j">
             <CellLook
-              :row="1"
-              :col="1"
+              v-if="field[i - 1][j - 1] === 'black'"
               :cellSize="cellSize"
-              :frameSize="0"
-              :color="playareaColor[i - 1][j - 1]"
+              color="black"
+              @mousedown="handleMouseDown(i, j)"
+              @mouseenter="handleMouseEnter(i, j)"
+            />
+            <CellLook
+              v-else-if="field[i - 1][j - 1] === 'white'"
+              :cellSize="cellSize"
+              color="white"
+              @mousedown="handleMouseDown(i, j)"
+              @mouseenter="handleMouseEnter(i, j)"
+            />
+            <CellLook
+              v-else
+              :cellSize="cellSize"
+              color="white"
+              :text="field[i - 1][j - 1]"
               @mousedown="handleMouseDown(i, j)"
               @mouseenter="handleMouseEnter(i, j)"
             />
@@ -155,14 +214,7 @@ const reset = () => {
     </div>
     <div class="pallet">
       <div v-for="color in pallet" :key="color">
-        <CellLook
-          :row="1"
-          :col="1"
-          :cellSize="50"
-          :frameSize="0"
-          :color="color"
-          @click="selectedColor = color"
-        />
+        <CellLook :cellSize="50" :color="color" @click="selectedColor = color" />
       </div>
     </div>
     <div class="debug">
