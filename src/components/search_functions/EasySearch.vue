@@ -33,18 +33,18 @@ const isLoading = ref(false);
 
 const wordLength = ref(0);
 watch(wordLength, () => {
-  sessionStorage.setItem('wordLengthEasySearch', wordLength.value.toString());
+  sessionStorage.setItem('WordSearch_Easy_wordLength', wordLength.value.toString());
 });
 
 const query = ref('');
 watch(query, (newValue) => {
-  sessionStorage.setItem('queryEasySearch', newValue);
+  sessionStorage.setItem('WordSearch_Easy_query', newValue);
 });
 const results = ref<string[]>([]);
 const dictNames = ['buta', 'eigo', 'illust1_3', 'ippan'];
 const selectedDict = ref(dictNames[0]);
 watch(selectedDict, () => {
-  sessionStorage.setItem('selectedDictEasySearch', selectedDict.value);
+  sessionStorage.setItem('WordSearch_Easy_selectedDict', selectedDict.value);
 });
 const dict = ref<string[]>([]);
 
@@ -71,14 +71,14 @@ const randomOutput = async () => {
 
 onMounted(() => {
   isLoading.value = true;
-  if (sessionStorage.getItem('queryEasySearch')) {
-    query.value = sessionStorage.getItem('queryEasySearch')!;
+  if (sessionStorage.getItem('WordSearch_Easy_query')) {
+    query.value = sessionStorage.getItem('WordSearch_Easy_query')!;
   }
-  if (sessionStorage.getItem('selectedDictEasySearch')) {
-    selectedDict.value = sessionStorage.getItem('selectedDictEasySearch')!;
+  if (sessionStorage.getItem('WordSearch_Easy_selectedDict')) {
+    selectedDict.value = sessionStorage.getItem('WordSearch_Easy_selectedDict')!;
   }
-  if (sessionStorage.getItem('wordLengthEasySearch')) {
-    wordLength.value = parseInt(sessionStorage.getItem('wordLengthEasySearch')!);
+  if (sessionStorage.getItem('WordSearch_Easy_wordLength')) {
+    wordLength.value = parseInt(sessionStorage.getItem('WordSearch_Easy_wordLength')!);
   }
   loadDict();
   isLoading.value = false;

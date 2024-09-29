@@ -17,6 +17,12 @@ const cellHeightPx = ref(props.row%2 === 0 ? frameSizePx : cellSizePx);
 
 </script>
 
+<template>
+  <div class="cell">
+    <slot></slot>
+  </div>
+</template>
+
 <style>
 .cell {
   width: v-bind(cellWidthPx);

@@ -52,24 +52,24 @@ const youon =
 
 const wordLength = ref(0)
 watch(wordLength, (newValue) => {
-  sessionStorage.setItem('wordLengthCaesarSearch', newValue.toString())
+  sessionStorage.setItem('WordSearch_Caesar_wordLength', newValue.toString())
 })
 
 const query = ref('')
 watch(query, (newValue) => {
-  sessionStorage.setItem('queryCaesarSearch', newValue)
+  sessionStorage.setItem('WordSearch_Caesar_query', newValue)
 })
 const results = ref<string[]>([])
 const dictNames = ['buta', 'eigo', 'illust1_3', 'ippan']
 const selectedDict = ref(dictNames[0])
 watch(selectedDict, (newValue) => {
-  sessionStorage.setItem('selectedDictCaesarSearch', newValue)
+  sessionStorage.setItem('WordSearch_Caesar_selectedDict', newValue)
 })
 const dict = ref<string[]>([])
 
 const shift = ref(0)
 watch(shift, (newValue) => {
-  sessionStorage.setItem('shiftCaesarSearch', newValue.toString())
+  sessionStorage.setItem('WordSearch_Caesar_shift', newValue.toString())
 })
 
 const isLoading = ref(false)
@@ -82,7 +82,7 @@ const loadDict = async () => {
 
 const sortMode = ref('word')
 watch(sortMode, (newValue) => {
-  sessionStorage.setItem('sortModeCaesarSearch', newValue)
+  sessionStorage.setItem('WordSearch_Caesar_sortMode', newValue)
 })
 
 const search = async () => {
@@ -229,20 +229,20 @@ const randomOutput = async () => {
 
 onMounted(() => {
   isLoading.value = true
-  if (sessionStorage.getItem('queryCaesarSearch')) {
-    query.value = sessionStorage.getItem('queryCaesarSearch')!
+  if (sessionStorage.getItem('WordSearch_Caesar_query')) {
+    query.value = sessionStorage.getItem('WordSearch_Caesar_query')!
   }
-  if (sessionStorage.getItem('selectedDictCaesarSearch')) {
-    selectedDict.value = sessionStorage.getItem('selectedDictCaesarSearch')!
+  if (sessionStorage.getItem('WordSearch_Caesar_selectedDict')) {
+    selectedDict.value = sessionStorage.getItem('WordSearch_Caesar_selectedDict')!
   }
-  if (sessionStorage.getItem('shiftCaesarSearch')) {
-    shift.value = parseInt(sessionStorage.getItem('shiftCaesarSearch')!)
+  if (sessionStorage.getItem('WordSearch_Caesar_shift')) {
+    shift.value = parseInt(sessionStorage.getItem('WordSearch_Caesar_shift')!)
   }
-  if (sessionStorage.getItem('wordLengthCaesarSearch')) {
-    wordLength.value = parseInt(sessionStorage.getItem('wordLengthCaesarSearch')!)
+  if (sessionStorage.getItem('WordSearch_Caesar_wordLength')) {
+    wordLength.value = parseInt(sessionStorage.getItem('WordSearch_Caesar_wordLength')!)
   }
-  if (sessionStorage.getItem('sortModeCaesarSearch')) {
-    sortMode.value = sessionStorage.getItem('sortModeCaesarSearch')!
+  if (sessionStorage.getItem('WordSearch_Caesar_sortMode')) {
+    sortMode.value = sessionStorage.getItem('WordSearch_Caesar_sortMode')!
   }
   loadDict()
   isLoading.value = false

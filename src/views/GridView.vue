@@ -1,15 +1,13 @@
 <script setup lang="ts">
+import CellLook from '@/components/CellLook.vue';
 import { onMounted, watch } from 'vue';
-import { ref, computed } from 'vue'
+import { ref } from 'vue'
 
 const H = ref(5);
 const W = ref(5);
 
 const cellSize = ref(40);
 const frameSize = ref(10);
-
-const cellSizePx = computed(() => `${cellSize.value}px`);
-const frameSizePx = computed(() => `${frameSize.value}px`);
 
 const isFrameChangable = ref(false);
 const isIntersectionChangable = ref(false);
@@ -48,34 +46,34 @@ watch([H, W, isFrameChangable, isIntersectionChangable], () => {
     }
   }
   playareaColor.value = newPlayareaColor;
-  sessionStorage.setItem('H', H.value.toString());
-  sessionStorage.setItem('W', W.value.toString());
-  sessionStorage.setItem('playareaColor', JSON.stringify(playareaColor.value));
+  sessionStorage.setItem('Grid_H', H.value.toString());
+  sessionStorage.setItem('Grid_W', W.value.toString());
+  sessionStorage.setItem('Grid_playareaColor', JSON.stringify(playareaColor.value));
 });
 
 watch(cellSize, (newValue) => {
-  sessionStorage.setItem('cellSize', newValue.toString());
+  sessionStorage.setItem('Grid_cellSize', newValue.toString());
 })
 
 watch(frameSize, (newValue) => {
-  sessionStorage.setItem('frameSize', newValue.toString());
+  sessionStorage.setItem('Grid_frameSize', newValue.toString());
 })
 
 watch(isFrameChangable, (newValue) => {
-  sessionStorage.setItem('isFrameChangable', newValue.toString());
+  sessionStorage.setItem('Grid_isFrameChangable', newValue.toString());
 })
 
 watch(isIntersectionChangable, (newValue) => {
-  sessionStorage.setItem('isIntersectionChangable', newValue.toString());
+  sessionStorage.setItem('Grid_isIntersectionChangable', newValue.toString());
 })
 
 watch(selectedColor, (newValue) => {
-  sessionStorage.setItem('selectedColor', newValue.toString());
+  sessionStorage.setItem('Grid_selectedColor', newValue.toString());
 })
 
 watch(playareaColor, (newValue) => {
   console.log('playareaColor changed');
-  sessionStorage.setItem('playareaColor', JSON.stringify(newValue));
+  sessionStorage.setItem('Grid_playareaColor', JSON.stringify(newValue));
 }, { deep: true });
 
 const selectColor = (color: string) => {
@@ -158,41 +156,41 @@ watch(isIntersectionChangable, (newValue) => {
 
 onMounted(() => {
   console.log('mounted');
-  console.log(sessionStorage.getItem('playareaColor'));
-  if (sessionStorage.getItem('H')) {
-    H.value = parseInt(sessionStorage.getItem('H') || '5');
+  console.log(sessionStorage.getItem('Grid_playareaColor'));
+  if (sessionStorage.getItem('Grid_H')) {
+    H.value = parseInt(sessionStorage.getItem('Grid_H') || '5');
   } else {
-    sessionStorage.setItem('H', H.value.toString());
+    sessionStorage.setItem('Grid_H', H.value.toString());
   }
-  if (sessionStorage.getItem('W')) {
-    W.value = parseInt(sessionStorage.getItem('W') || '5');
+  if (sessionStorage.getItem('Grid_W')) {
+    W.value = parseInt(sessionStorage.getItem('Grid_W') || '5');
   } else {
-    sessionStorage.setItem('W', W.value.toString());
+    sessionStorage.setItem('Grid_W', W.value.toString());
   }
-  if (sessionStorage.getItem('cellSize')) {
-    cellSize.value = parseInt(sessionStorage.getItem('cellSize') || '40');
+  if (sessionStorage.getItem('Grid_cellSize')) {
+    cellSize.value = parseInt(sessionStorage.getItem('Grid_cellSize') || '40');
   } else {
-    sessionStorage.setItem('cellSize', cellSize.value.toString());
+    sessionStorage.setItem('Grid_cellSize', cellSize.value.toString());
   }
-  if (sessionStorage.getItem('frameSize')) {
-    frameSize.value = parseInt(sessionStorage.getItem('frameSize') || '10');
+  if (sessionStorage.getItem('Grid_frameSize')) {
+    frameSize.value = parseInt(sessionStorage.getItem('Grid_frameSize') || '10');
   } else {
-    sessionStorage.setItem('frameSize', frameSize.value.toString());
+    sessionStorage.setItem('Grid_frameSize', frameSize.value.toString());
   }
-  if (sessionStorage.getItem('isFrameChangable')) {
-    isFrameChangable.value = sessionStorage.getItem('isFrameChangable') === 'true';
+  if (sessionStorage.getItem('Grid_isFrameChangable')) {
+    isFrameChangable.value = sessionStorage.getItem('Grid_isFrameChangable') === 'true';
   } else {
-    sessionStorage.setItem('isFrameChangable', isFrameChangable.value.toString());
+    sessionStorage.setItem('Grid_isFrameChangable', isFrameChangable.value.toString());
   }
-  if (sessionStorage.getItem('isIntersectionChangable')) {
-    isIntersectionChangable.value = sessionStorage.getItem('isIntersectionChangable') === 'true';
+  if (sessionStorage.getItem('Grid_isIntersectionChangable')) {
+    isIntersectionChangable.value = sessionStorage.getItem('Grid_isIntersectionChangable') === 'true';
   } else {
-    sessionStorage.setItem('isIntersectionChangable', isIntersectionChangable.value.toString());
+    sessionStorage.setItem('Grid_isIntersectionChangable', isIntersectionChangable.value.toString());
   }
-  if (sessionStorage.getItem('selectedColor')) {
-    selectedColor.value = sessionStorage.getItem('selectedColor') || 'red';
+  if (sessionStorage.getItem('Grid_selectedColor')) {
+    selectedColor.value = sessionStorage.getItem('Grid_selectedColor') || 'red';
   } else {
-    sessionStorage.setItem('selectedColor', selectedColor.value.toString());
+    sessionStorage.setItem('Grid_selectedColor', selectedColor.value.toString());
   }
   const initialPlayareaColor = Array.from({ length: 2 * H.value + 1 }, () =>
     Array.from({ length: 2 * W.value + 1 }, () => 'white')
@@ -215,13 +213,13 @@ onMounted(() => {
       }
     }
   }
-  if (sessionStorage.getItem('playareaColor')) {
-    playareaColor.value = JSON.parse(sessionStorage.getItem('playareaColor') || '[]');
+  if (sessionStorage.getItem('Grid_playareaColor')) {
+    playareaColor.value = JSON.parse(sessionStorage.getItem('Grid_playareaColor') || '[]');
     if (playareaColor.value.length === 0) {
       playareaColor.value = initialPlayareaColor;
     }
   } else {
-    sessionStorage.setItem('playareaColor', JSON.stringify(playareaColor.value));
+    sessionStorage.setItem('Grid_playareaColor', JSON.stringify(playareaColor.value));
     playareaColor.value = initialPlayareaColor;
   }
   console.log(playareaColor.value);
@@ -266,50 +264,15 @@ const reset = () => {
       <div class="field">
         <div class="row" v-for="i in 2 * H + 1" :key="i">
           <div v-for="j in 2 * W + 1" :key="i * (2 * H + 1) + j">
-            <div
-              v-if="i % 2 == 1 && j % 2 == 1"
-              class="cell"
+            <CellLook
+              :row="i-1"
+              :col="j-1"
+              :cellSize="cellSize"
+              :frameSize="frameSize"
+              :color="playareaColor[i-1][j-1]"
               @mousedown="handleMouseDown(i, j)"
               @mouseenter="handleMouseEnter(i, j)"
-              :style="{
-                width: frameSizePx,
-                height: frameSizePx,
-                backgroundColor: playareaColor[i - 1][j - 1]
-              }"
-            ></div>
-            <div
-              v-else-if="i % 2 == 0 && j % 2 == 1"
-              class="cell"
-              @mousedown="handleMouseDown(i, j)"
-              @mouseenter="handleMouseEnter(i, j)"
-              :style="{
-                width: frameSizePx,
-                height: cellSizePx,
-                backgroundColor: playareaColor[i - 1][j - 1]
-              }"
-            ></div>
-            <div
-              v-else-if="i % 2 == 1 && j % 2 == 0"
-              class="cell"
-              @mousedown="handleMouseDown(i, j)"
-              @mouseenter="handleMouseEnter(i, j)"
-              :style="{
-                width: cellSizePx,
-                height: frameSizePx,
-                backgroundColor: playareaColor[i - 1][j - 1]
-              }"
-            ></div>
-            <div
-              v-else
-              class="cell"
-              @mousedown="handleMouseDown(i, j)"
-              @mouseenter="handleMouseEnter(i, j)"
-              :style="{
-                width: cellSizePx,
-                height: cellSizePx,
-                backgroundColor: playareaColor[i - 1][j - 1]
-              }"
-            ></div>
+            />
           </div>
         </div>
       </div>
@@ -361,10 +324,4 @@ input {
   width: 50px;
 }
 
-.cell {
-  border: 1px solid #ccc;
-  display: flex;
-  justify-content: center;
-  align-items: center;
-}
 </style>

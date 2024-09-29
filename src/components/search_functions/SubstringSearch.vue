@@ -36,29 +36,29 @@ const isLoading = ref(false)
 
 const childString = ref('')
 watch(childString, (newValue) => {
-  sessionStorage.setItem('childStringSubstringSearch', newValue)
+  sessionStorage.setItem('WordSearch_Substring_childString', newValue)
 })
 
 const childLength = ref(0)
 watch(childLength, (newValue) => {
-  sessionStorage.setItem('childLengthSubstringSearch', newValue.toString())
+  sessionStorage.setItem('WordSearch_Substring_childLength', newValue.toString())
 })
 
 const parentString = ref('')
 watch(parentString, (newValue) => {
-  sessionStorage.setItem('parentStringSubstringSearch', newValue)
+  sessionStorage.setItem('WordSearch_Substring_parentString', newValue)
 })
 
 const parentLength = ref(0)
 watch(parentLength, (newValue) => {
-  sessionStorage.setItem('parentLengthSubstringSearch', newValue.toString())
+  sessionStorage.setItem('WordSearch_Substring_parentLength', newValue.toString())
 })
 
 const results = ref<string[]>([])
 const dictNames = ['buta', 'eigo', 'illust1_3', 'ippan']
 const selectedDict = ref(dictNames[0])
 watch(selectedDict, () => {
-  sessionStorage.setItem('selectedDictSubstringSearch', selectedDict.value)
+  sessionStorage.setItem('WordSearch_Substring_selectedDict', selectedDict.value)
 })
 const dict = ref<string[]>([])
 
@@ -149,20 +149,20 @@ const randomOutput = async () => {
 
 onMounted(() => {
   isLoading.value = true
-  if (sessionStorage.getItem('selectedDictSubstringSearch')) {
-    selectedDict.value = sessionStorage.getItem('selectedDictSubstringSearch')!
+  if (sessionStorage.getItem('WordSearch_Substring_selectedDict')) {
+    selectedDict.value = sessionStorage.getItem('WordSearch_Substring_selectedDict')!
   }
-  if (sessionStorage.getItem('childStringSubstringSearch')) {
-    childString.value = sessionStorage.getItem('childStringSubstringSearch')!
+  if (sessionStorage.getItem('WordSearch_Substring_childString')) {
+    childString.value = sessionStorage.getItem('WordSearch_Substring_childString')!
   }
-  if (sessionStorage.getItem('childLengthSubstringSearch')) {
-    childLength.value = parseInt(sessionStorage.getItem('childLengthSubstringSearch')!)
+  if (sessionStorage.getItem('WordSearch_Substring_childLength')) {
+    childLength.value = parseInt(sessionStorage.getItem('WordSearch_Substring_childLength')!)
   }
-  if (sessionStorage.getItem('parentStringSubstringSearch')) {
-    parentString.value = sessionStorage.getItem('parentStringSubstringSearch')!
+  if (sessionStorage.getItem('WordSearch_Substring_parentString')) {
+    parentString.value = sessionStorage.getItem('WordSearch_Substring_parentString')!
   }
-  if (sessionStorage.getItem('parentLengthSubstringSearch')) {
-    parentLength.value = parseInt(sessionStorage.getItem('parentLengthSubstringSearch')!)
+  if (sessionStorage.getItem('WordSearch_Substring_parentLength')) {
+    parentLength.value = parseInt(sessionStorage.getItem('WordSearch_Substring_parentLength')!)
   }
   loadDict()
   isLoading.value = false
