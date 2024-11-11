@@ -10,6 +10,7 @@ import { RouterLink, RouterView } from 'vue-router'
         <RouterLink to="/grid">Grid</RouterLink>
         <RouterLink to="/search">Word Search</RouterLink>
         <RouterLink to="/crossword">Crossword</RouterLink>
+        <RouterLink to="/rookMove">RookMove</RouterLink>
       </nav>
     </div>
   </header>

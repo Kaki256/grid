@@ -22,6 +22,11 @@ const router = createRouter({
       path: '/crossword',
       name: 'crossword',
       component: () => import('../views/CrosswordView.vue')
+    },
+    {
+      path: '/rookMove',
+      name: 'rookMove',
+      component: () => import('../views/RookMoveView.vue')
     }
   ]
 })
