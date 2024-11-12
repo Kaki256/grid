@@ -1,0 +1,1 @@
+.play-area{display:flex;flex-direction:row}.field{display:flex;flex-direction:column;margin:30px}.row{display:flex}.control{display:flex;flex-direction:row;margin:30px}input{margin:5px;padding:5px;border:1px solid #ccc;border-radius:5px;width:50px}
