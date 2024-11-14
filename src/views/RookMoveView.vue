@@ -7,23 +7,28 @@ const field = ref('')
 
 const templateFields = {
   gojuuon:
-    'んわらやまはなたさかあ' +
-    '\n' +
-    '　　り　みひにちしきい' +
-    '\n' +
-    '　　るゆむふぬつすくう' +
-    '\n' +
-    '　　れ　めへねてせけえ' +
-    '\n' +
+    'んわらやまはなたさかあ\n' +
+    '　　り　みひにちしきい\n' +
+    '　　るゆむふぬつすくう\n' +
+    '　　れ　めへねてせけえ\n' +
     '　をろよもほのとそこお',
 
-  eigo: 'ABCDE' + '\n' + 'FGHIJ' + '\n' + 'KLMNO' + '\n' + 'PQRST' + '\n' + 'UVWXYZ'
+  eigo:
+    'ABCDE \n' +
+    'FGHIJ \n' +
+    'KLMNO \n' +
+    'PQRST \n' +
+    'UVWXYZ'
 }
 
 const inputLength = ref(5)
 
-const H = ref(2*inputLength.value + 1)
-const W = ref(2*inputLength.value + 1)
+watch(inputLength, (newValue) => {
+  sessionStorage.setItem('RookMove_inputLength', newValue.toString())
+})
+
+const H = computed(() => 2 * inputLength.value + 1)
+const W = computed(() => 2 * inputLength.value + 1)
 
 const cellSize = ref(40)
 
@@ -35,13 +40,16 @@ const playareaColor = ref<Array<Array<string>>>(
 const XOR = (a: boolean, b: boolean) => (a || b) && !(a && b)
 
 // H, W が 変更されるたびに実行される
-watch([H, W], () => {
+watch(inputLength, () => {
   let newPlayareaColor = Array.from({ length: H.value }, () =>
     Array.from({ length: W.value }, () => 'white')
   )
+  for (let i = 0; i < Math.min(H.value, playareaColor.value.length); i++) {
+    for (let j = 0; j < Math.min(W.value, playareaColor.value[i].length); j++) {
+      newPlayareaColor[i][j] = playareaColor.value[i][j]
+    }
+  }
   playareaColor.value = newPlayareaColor
-  sessionStorage.setItem('RookMove_H', H.value.toString())
-  sessionStorage.setItem('RookMove_W', W.value.toString())
   sessionStorage.setItem('RookMove_playareaColor', JSON.stringify(playareaColor.value))
 })
 
@@ -94,15 +102,10 @@ document.addEventListener('mouseup', handleMouseUp)
 onMounted(() => {
   console.log('mounted')
   console.log(sessionStorage.getItem('RookMove_playareaColor'))
-  if (sessionStorage.getItem('RookMove_H')) {
-    H.value = parseInt(sessionStorage.getItem('RookMove_H') || '5')
+  if (sessionStorage.getItem('RookMove_inputLength')) {
+    inputLength.value = parseInt(sessionStorage.getItem('RookMove_inputLength') || '5')
   } else {
-    sessionStorage.setItem('RookMove_H', H.value.toString())
-  }
-  if (sessionStorage.getItem('RookMove_W')) {
-    W.value = parseInt(sessionStorage.getItem('RookMove_W') || '5')
-  } else {
-    sessionStorage.setItem('RookMove_W', W.value.toString())
+    sessionStorage.setItem('RookMove_inputLength', inputLength.value.toString())
   }
   if (sessionStorage.getItem('RookMove_cellSize')) {
     cellSize.value = parseInt(sessionStorage.getItem('RookMove_cellSize') || '40')
@@ -127,11 +130,15 @@ onMounted(() => {
     sessionStorage.setItem('RookMove_field', field.value)
   }
   console.log(playareaColor.value)
+  if (sessionStorage.getItem('RookMove_selectedDict')) {
+    selectedDict.value = sessionStorage.getItem('RookMove_selectedDict') || 'buta'
+  } else {
+    sessionStorage.setItem('RookMove_selectedDict', selectedDict.value)
+  }
 })
 
 const reset = () => {
-  H.value = 5
-  W.value = 5
+  inputLength.value = 5
   cellSize.value = 40
   playareaColor.value = []
   for (let i = 0; i < H.value; i++) {
@@ -184,7 +191,7 @@ const search = async () => {
   let fieldStrings = normalizedField.split('\n')
 
   // アルファベット大文字を小文字に変換
-  fieldStrings = normalizedField.split('\n').map(line => line.toLowerCase())
+  fieldStrings = normalizedField.split('\n').map((line) => line.toLowerCase())
 
   console.log(fieldStrings)
 
