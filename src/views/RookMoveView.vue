@@ -13,12 +13,7 @@ const templateFields = {
     '　　れ　めへねてせけえ\n' +
     '　をろよもほのとそこお',
 
-  eigo:
-    'ABCDE \n' +
-    'FGHIJ \n' +
-    'KLMNO \n' +
-    'PQRST \n' +
-    'UVWXYZ'
+  eigo: 'ABCDE \n' + 'FGHIJ \n' + 'KLMNO \n' + 'PQRST \n' + 'UVWXYZ'
 }
 
 const inputLength = ref(5)
@@ -44,14 +39,28 @@ watch(inputLength, () => {
   let newPlayareaColor = Array.from({ length: H.value }, () =>
     Array.from({ length: W.value }, () => 'white')
   )
-  for (let i = 0; i < Math.min(H.value, playareaColor.value.length); i++) {
-    for (let j = 0; j < Math.min(W.value, playareaColor.value[i].length); j++) {
-      newPlayareaColor[i][j] = playareaColor.value[i][j]
+  // for (let i = 0; i < Math.min(H.value, playareaColor.value.length); i++) {
+  //   for (let j = 0; j < Math.min(W.value, playareaColor.value[i].length); j++) {
+  //     newPlayareaColor[i][j] = playareaColor.value[i][j]
+  //   }
+  // }
+  for (let i = 0; i < Math.min(playareaColor.value.length, H.value); i++) {
+    for (let j = 0; j < Math.min(playareaColor.value[0].length, W.value); j++) {
+      newPlayareaColor[i + relu(H.value - playareaColor.value.length) / 2][
+        j + relu(W.value - playareaColor.value[0].length) / 2
+      ] =
+        playareaColor.value[i + relu(playareaColor.value.length - H.value) / 2][
+          j + relu(playareaColor.value[0].length - W.value) / 2
+        ]
     }
   }
   playareaColor.value = newPlayareaColor
   sessionStorage.setItem('RookMove_playareaColor', JSON.stringify(playareaColor.value))
 })
+
+function relu(x: number) {
+  return Math.max(0, x)
+}
 
 watch(cellSize, (newValue) => {
   sessionStorage.setItem('RookMove_cellSize', newValue.toString())
@@ -218,8 +227,8 @@ const search = async () => {
   for (let i = 0; i < H.value; i++) {
     for (let j = 0; j < W.value; j++) {
       if (playareaColor.value[i][j] === 'black') {
-        dx.push(i + 1 - center.x)
-        dy.push(j + 1 - center.y)
+        dx.push(j + 1 - center.x)
+        dy.push(i + 1 - center.y)
       }
     }
   }
@@ -266,6 +275,9 @@ const search = async () => {
   // その後、各単語に対して、その単語が作れるかどうかを判定する (つまり、各単語の各文字間に辺が張られているかどうかを確認する)
 
   for (let word of dict.value) {
+    if (word.length === 1) {
+      continue
+    }
     let ok = true
     for (let i = 0; i < word.length - 1; i++) {
       if (!(word[i] in graph)) {
