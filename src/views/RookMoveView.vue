@@ -31,9 +31,6 @@ const playareaColor = ref<Array<Array<string>>>(
   Array.from({ length: H.value }, () => Array.from({ length: W.value }, () => 'white'))
 )
 
-// XOR
-const XOR = (a: boolean, b: boolean) => (a || b) && !(a && b)
-
 // H, W が 変更されるたびに実行される
 watch(inputLength, () => {
   let newPlayareaColor = Array.from({ length: H.value }, () =>
