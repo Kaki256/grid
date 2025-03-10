@@ -12,7 +12,7 @@ jobs:
     steps:
       # ソースコードをチェックアウト
       - name: Check out the repository
-        uses: actions/checkout@v3
+        uses: actions/checkout@v4
 
       # もしビルド工程が必要ならここに npm install / npm run build などを挟む
       # 例: npmでビルドする場合
