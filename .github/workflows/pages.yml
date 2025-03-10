@@ -1,0 +1,47 @@
+name: Deploy to GitHub Pages
+
+on:
+  push:
+    branches:
+      - main   # ← メインブランチ名を合わせる
+
+jobs:
+  build-and-deploy:
+    runs-on: ubuntu-latest
+
+    steps:
+      # ソースコードをチェックアウト
+      - name: Check out the repository
+        uses: actions/checkout@v3
+
+      # もしビルド工程が必要ならここに npm install / npm run build などを挟む
+      # 例: npmでビルドする場合
+      # - name: Set up Node
+      #   uses: actions/setup-node@v3
+      #   with:
+      #     node-version: 16
+      #
+      # - name: Install dependencies
+      #   run: npm ci
+      #
+      # - name: Build
+      #   run: npm run build
+
+      # GitHub Pages へデプロイ
+      - name: Deploy to GitHub Pages
+        uses: actions/upload-pages-artifact@v2
+        with:
+          path: .
+          # ↑ ビルドした成果物をアップロードするディレクトリを指定
+          #   もし npm run build で ./dist に出力しているなら "path: ./dist" のように変更
+
+  # Pages 専用のデプロイジョブ
+  deploy:
+    needs: build-and-deploy
+    runs-on: ubuntu-latest
+    permissions:
+      pages: write
+      id-token: write
+    steps:
+      - name: Deploy
+        uses: actions/deploy-pages@v1
